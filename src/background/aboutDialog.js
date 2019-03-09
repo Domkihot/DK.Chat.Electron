@@ -1,48 +1,22 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { getMainWindow } from './mainWindow';
-import i18n from '../i18n';
+import i18n from '../i18n/index.js';
 
-
-let aboutWindow;
-
-const openAboutDialog = async() => {
-	if (aboutWindow) {
-		return;
-	}
-
+export default async() => {
 	const mainWindow = await getMainWindow();
-	aboutWindow = new BrowserWindow({
-		title: i18n.__('dialog.about.title', { appName: app.getName() }),
+	const win = new BrowserWindow({
+		title: i18n.__('About %s', app.getName()),
 		parent: mainWindow,
-		modal: process.platform !== 'darwin',
 		width: 400,
 		height: 300,
 		type: 'toolbar',
 		resizable: false,
-		fullscreenable: false,
 		maximizable: false,
 		minimizable: false,
-		fullscreen: false,
+		center: true,
 		show: false,
 	});
-	aboutWindow.setMenuBarVisibility(false);
-
-	aboutWindow.once('ready-to-show', () => {
-		aboutWindow.show();
-	});
-
-	aboutWindow.once('closed', () => {
-		aboutWindow = null;
-	});
-
-	aboutWindow.params = { appName: app.getName(), appVersion: app.getVersion() };
-
-	aboutWindow.loadFile(`${ __dirname }/public/about-dialog.html`);
+	win.setMenuBarVisibility(false);
+	win.once('ready-to-show', () => win.show());
+	win.loadURL(`file://${ __dirname }/public/about.html`);
 };
-
-const closeAboutDialog = () => {
-	aboutWindow && aboutWindow.destroy();
-};
-
-ipcMain.on('open-about-dialog', () => openAboutDialog());
-ipcMain.on('close-about-dialog', () => closeAboutDialog());

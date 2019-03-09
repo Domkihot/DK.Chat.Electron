@@ -1,6 +1,8 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import createWindowStateKeeper from './windowState';
 import { whenReady, whenReadyToShow } from './utils';
+import env from '../env';
+import icon from './icon';
 
 
 let mainWindow = null;
@@ -14,7 +16,8 @@ const mainWindowOptions = {
 	height: 600,
 	minWidth: 600,
 	minHeight: 400,
-	titleBarStyle: 'hidden',
+	title: app.getName(),
+	// titleBarStyle: 'hidden',
 	show: false,
 };
 
@@ -39,8 +42,6 @@ const attachWindowStateHandling = (mainWindow) => {
 	});
 
 	const close = () => {
-		mainWindow.blur();
-
 		if (process.platform === 'darwin' || state.hideOnClose) {
 			mainWindow.hide();
 		} else if (process.platform === 'win32') {
@@ -50,7 +51,7 @@ const attachWindowStateHandling = (mainWindow) => {
 		}
 	};
 
-	app.on('activate', () => mainWindow && mainWindow.show());
+	app.on('activate', () => mainWindow.show());
 	app.on('before-quit', () => {
 		windowStateKeeper.saveState.flush();
 		mainWindow = null;
@@ -81,10 +82,20 @@ export const getMainWindow = async() => {
 		mainWindow.webContents.on('will-navigate', (event) => event.preventDefault());
 		mainWindow.loadURL(`file://${ __dirname }/public/app.html`);
 		attachWindowStateHandling(mainWindow);
-
-		if (process.env.NODE_ENV === 'development') {
-			mainWindow.openDevTools();
+		
+		if (process.platform !== 'darwin') {
+			mainWindow.setIcon(await icon.render({
+				size: {
+					win32: [256, 128, 64, 48, 32, 24, 16],
+					linux: 128,
+				}[process.platform],
+			}));
+			
 		}
+		// mainWindow.setTitle('DK.Chat');
+		// if (env.name === 'development') {
+		// 	mainWindow.openDevTools();
+		// }
 	}
 
 	return mainWindow;
@@ -121,5 +132,4 @@ ipcMain.on('focus', async() => {
 	}
 
 	mainWindow.show();
-	mainWindow.focus();
 });

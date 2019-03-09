@@ -2,16 +2,16 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<title>Rocket.Chat</title>
-	<link rel="stylesheet" href="../stylesheets/main.css">
+	<title>DK.Chat</title>
+	<link rel="stylesheet" type="text/css" href="../stylesheets/main.css">
 	<script>
 		window.addEventListener('load', () => {
-			const i18n = require('../i18n');
-			document.querySelector('.add-server .tooltip').innerHTML = i18n.__('sidebar.addNewServer');
-			document.querySelector('#login-card .connect__prompt').innerHTML = i18n.__('landing.inputUrl');
-			document.querySelector('#login-card #invalidUrl').innerHTML = i18n.__('error.noValidServerFound');
-			document.querySelector('#login-card .connect__error').innerHTML = i18n.__('error.offline');
-			document.querySelector('#login-card .login').innerHTML = i18n.__('landing.connect');
+			const i18n = require('../i18n/index');
+			document.querySelector('.add-server .tooltip').innerHTML = i18n.__('Add new server');
+			document.querySelector('#login-card .connect__prompt').innerHTML = i18n.__('Enter_your_server_URL');
+			document.querySelector('#login-card #invalidUrl').innerHTML = i18n.__('No_valid_server_found');
+			document.querySelector('#login-card .connect__error').innerHTML = i18n.__('Check_connection');
+			document.querySelector('#login-card .login').innerHTML = i18n.__('Connect');
 
 			const script = document.createElement('script');
 			script.src = '../app.js';
@@ -49,7 +49,7 @@
 				</header>
 				<div class="fields">
 					<div class="input-text active">
-						<input type="text" name="host" placeholder="https://open.rocket.chat" dir="auto">
+						<input type="text" name="host" value="http://chat.domkihot.ru:3000" placeholder="http://chat.domkihot.ru:3000" dir="auto">
 					</div>
 				</div>
 

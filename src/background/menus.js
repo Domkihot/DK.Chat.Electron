@@ -1,26 +1,25 @@
 import { app, Menu } from 'electron';
 import { EventEmitter } from 'events';
 import { getMainWindow } from './mainWindow';
-import i18n from '../i18n';
-
+import i18n from '../i18n/index.js';
 
 const createTemplate = ({
 	appName,
 	servers = [],
 	currentServerUrl = null,
 	showTrayIcon = true,
+	showUserStatusInTray = true,
 	showFullScreen = false,
 	showMenuBar = true,
 	showServerList = true,
 	showWindowOnUnreadChanged = false,
 }, events) => ([
 	{
-		label: process.platform === 'darwin' ? appName : i18n.__('menus.fileMenu'),
+		label: process.platform === 'darwin' ? appName : i18n.__('&File'),
 		submenu: [
 			...(process.platform === 'darwin' ? [
 				{
-					id: 'about',
-					label: i18n.__('menus.about', { appName }),
+					label: i18n.__('About %s', appName),
 					click: () => events.emit('about'),
 				},
 				{
@@ -48,9 +47,14 @@ const createTemplate = ({
 					type: 'separator',
 				},
 			] : []),
+			// {
+			// 	label: i18n.__('Preferences'),
+			// 	accelerator: 'CommandOrControl+,',
+			// 	click: () => events.emit('preferences'),
+			// },
 			...(process.platform !== 'darwin' ? [
 				{
-					label: i18n.__('menus.addNewServer'),
+					label: i18n.__('Add &new server'),
 					accelerator: 'CommandOrControl+N',
 					click: () => events.emit('add-new-server'),
 				},
@@ -60,22 +64,22 @@ const createTemplate = ({
 			},
 			{
 				id: 'quit',
-				label: i18n.__('menus.quit', { appName }),
+				label: i18n.__('&Quit %s', appName),
 				accelerator: 'CommandOrControl+Q',
 				click: () => events.emit('quit'),
 			},
 		],
 	},
 	{
-		label: i18n.__('menus.editMenu'),
+		label: i18n.__('&Edit'),
 		submenu: [
 			{
-				label: i18n.__('menus.undo'),
+				label: i18n.__('&Undo'),
 				accelerator: 'CommandOrControl+Z',
 				role: 'undo',
 			},
 			{
-				label: i18n.__('menus.redo'),
+				label: i18n.__('&Redo'),
 				accelerator: process.platform === 'win32' ? 'Control+Y' : 'CommandOrControl+Shift+Z',
 				role: 'redo',
 			},
@@ -83,45 +87,45 @@ const createTemplate = ({
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.cut'),
+				label: i18n.__('Cu&t'),
 				accelerator: 'CommandOrControl+X',
 				role: 'cut',
 			},
 			{
-				label: i18n.__('menus.copy'),
+				label: i18n.__('&Copy'),
 				accelerator: 'CommandOrControl+C',
 				role: 'copy',
 			},
 			{
-				label: i18n.__('menus.paste'),
+				label: i18n.__('&Paste'),
 				accelerator: 'CommandOrControl+V',
 				role: 'paste',
 			},
 			{
-				label: i18n.__('menus.selectAll'),
+				label: i18n.__('Select &all'),
 				accelerator: 'CommandOrControl+A',
 				role: 'selectall',
 			},
 		],
 	},
 	{
-		label: i18n.__('menus.viewMenu'),
+		label: i18n.__('&View'),
 		submenu: [
 			{
-				label: i18n.__('menus.reload'),
+				label: i18n.__('&Reload'),
 				accelerator: 'CommandOrControl+R',
 				click: () => events.emit('reload-server'),
 			},
 			{
-				label: i18n.__('menus.reloadIgnoringCache'),
+				label: i18n.__('Reload ignoring cache'),
 				click: () => events.emit('reload-server', { ignoringCache: true }),
 			},
 			{
-				label: i18n.__('menus.clearTrustedCertificates'),
+				label: i18n.__('Clear trusted certificates'),
 				click: () => events.emit('reload-server', { ignoringCache: true, clearCertificates: true }),
 			},
 			{
-				label: i18n.__('menus.openDevTools'),
+				label: i18n.__('Open &DevTools'),
 				accelerator: process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
 				click: () => events.emit('open-devtools-for-server'),
 			},
@@ -129,12 +133,12 @@ const createTemplate = ({
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.back'),
+				label: i18n.__('&Back'),
 				accelerator: process.platform === 'darwin' ? 'Command+[' : 'Alt+Left',
 				click: () => events.emit('go-back'),
 			},
 			{
-				label: i18n.__('menus.forward'),
+				label: i18n.__('&Forward'),
 				accelerator: process.platform === 'darwin' ? 'Command+]' : 'Alt+Right',
 				click: () => events.emit('go-forward'),
 			},
@@ -142,14 +146,21 @@ const createTemplate = ({
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.showTrayIcon'),
+				label: i18n.__('Tray icon'),
 				type: 'checkbox',
 				checked: showTrayIcon,
 				click: () => events.emit('toggle', 'showTrayIcon'),
 			},
+			{
+				label: i18n.__('User status in tray'),
+				type: 'checkbox',
+				enabled: showTrayIcon,
+				checked: showTrayIcon && showUserStatusInTray,
+				click: () => events.emit('toggle', 'showUserStatusInTray'),
+			},
 			...(process.platform === 'darwin' ? [
 				{
-					label: i18n.__('menus.showFullScreen'),
+					label: i18n.__('Full screen'),
 					type: 'checkbox',
 					checked: showFullScreen,
 					accelerator: 'Control+Command+F',
@@ -157,14 +168,14 @@ const createTemplate = ({
 				},
 			] : [
 				{
-					label: i18n.__('menus.showMenuBar'),
+					label: i18n.__('Menu bar'),
 					type: 'checkbox',
 					checked: showMenuBar,
 					click: () => events.emit('toggle', 'showMenuBar'),
 				},
 			]),
 			{
-				label: i18n.__('menus.showServerList'),
+				label: i18n.__('Server list'),
 				type: 'checkbox',
 				checked: showServerList,
 				click: () => events.emit('toggle', 'showServerList'),
@@ -173,30 +184,30 @@ const createTemplate = ({
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.resetZoom'),
+				label: i18n.__('Reset zoom'),
 				accelerator: 'CommandOrControl+0',
 				role: 'resetzoom',
 			},
 			{
-				label: i18n.__('menus.zoomIn'),
+				label: i18n.__('Zoom in'),
 				accelerator: 'CommandOrControl+Plus',
 				role: 'zoomin',
 			},
 			{
-				label: i18n.__('menus.zoomOut'),
+				label: i18n.__('Zoom out'),
 				accelerator: 'CommandOrControl+-',
 				role: 'zoomout',
 			},
 		],
 	},
 	{
-		label: i18n.__('menus.windowMenu'),
+		label: i18n.__('&Window'),
 		id: 'window',
 		role: 'window',
 		submenu: [
 			...(process.platform === 'darwin' ? [
 				{
-					label: i18n.__('menus.addNewServer'),
+					label: i18n.__('Add &new server'),
 					accelerator: 'CommandOrControl+N',
 					click: () => events.emit('add-new-server'),
 				},
@@ -216,19 +227,19 @@ const createTemplate = ({
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.reload'),
+				label: i18n.__('&Reload'),
 				accelerator: 'CommandOrControl+Shift+R',
 				click: () => events.emit('reload-app'),
 			},
 			{
-				label: i18n.__('menus.toggleDevTools'),
+				label: i18n.__('Toggle &DevTools'),
 				click: () => events.emit('toggle-devtools'),
 			},
 			{
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.showOnUnreadMessage'),
+				label: i18n.__('Show on unread messages'),
 				type: 'checkbox',
 				checked: showWindowOnUnreadChanged,
 				click: () => events.emit('toggle', 'showWindowOnUnreadChanged'),
@@ -237,47 +248,47 @@ const createTemplate = ({
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.minimize'),
+				label: i18n.__('Minimize'),
 				accelerator: 'CommandOrControl+M',
 				role: 'minimize',
 			},
 			{
-				label: i18n.__('menus.close'),
+				label: i18n.__('Close'),
 				accelerator: 'CommandOrControl+W',
 				role: 'close',
 			},
 		],
 	},
 	{
-		label: i18n.__('menus.helpMenu'),
+		label: i18n.__('&Help'),
 		role: 'help',
 		submenu: [
 			{
-				label: i18n.__('menus.documentation'),
-				click: () => events.emit('open-url', 'https://rocket.chat/docs'),
+				label: i18n.__('Documentation'),
+				click: () => events.emit('open-url', 'http://apps.domkihot.ru/chat'),
 			},
 			{
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.reportIssue'),
-				click: () => events.emit('open-url', 'https://github.com/RocketChat/Rocket.Chat.Electron/issues/new'),
+				label: i18n.__('Report issue'),
+				click: () => events.emit('open-url', 'http://apps.domkihot.ru/chat#ask'),
 			},
 			{
-				label: i18n.__('menus.resetAppData'),
+				label: i18n.__('Reset app data'),
 				click: () => events.emit('reset-app-data'),
 			},
 			{
 				type: 'separator',
 			},
 			{
-				label: i18n.__('menus.learnMore'),
-				click: () => events.emit('open-url', 'https://rocket.chat'),
+				label: i18n.__('Learn more'),
+				click: () => events.emit('open-url', 'http://apps.domkihot.ru/chat'),
 			},
 			...(process.platform !== 'darwin' ? [
 				{
 					id: 'about',
-					label: i18n.__('menus.about', { appName }),
+					label: i18n.__('About %s', appName),
 					click: () => events.emit('about'),
 				},
 			] : []),
@@ -318,28 +329,5 @@ class Menus extends EventEmitter {
 		this.emit('update');
 	}
 }
-
-const unsetDefaultApplicationMenu = () => {
-	if (process.platform !== 'darwin') {
-		Menu.setApplicationMenu(null);
-		return;
-	}
-
-	const emptyMenuTemplate = [{
-		label: app.getName(),
-		submenu: [
-			{
-				label: i18n.__('menus.quit', { appName: app.getName() }),
-				accelerator: 'CommandOrControl+Q',
-				click() {
-					app.quit();
-				},
-			},
-		],
-	}];
-	Menu.setApplicationMenu(Menu.buildFromTemplate(emptyMenuTemplate));
-};
-
-app.on('ready', unsetDefaultApplicationMenu);
 
 export default new Menus();

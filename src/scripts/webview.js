@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import servers from './servers';
 import sidebar from './sidebar';
-import { ipcRenderer } from 'electron';
+import { desktopCapturer, ipcRenderer } from 'electron';
 
 class WebView extends EventEmitter {
 	constructor() {
@@ -33,11 +33,13 @@ class WebView extends EventEmitter {
 			this.loaded();
 		});
 
-		ipcRenderer.on('screenshare-result', (e, id) => {
+		ipcRenderer.on('screenshare-result', (e, result) => {
 			const webviewObj = this.getActive();
 			webviewObj.executeJavaScript(`
-				window.parent.postMessage({ sourceId: '${ id }' }, '*');
-			`);
+                window.parent.postMessage({
+                    sourceId: '${ result }'
+                }, '*')
+            `);
 		});
 	}
 
@@ -57,7 +59,7 @@ class WebView extends EventEmitter {
 
 		webviewObj = document.createElement('webview');
 		webviewObj.setAttribute('server', host.url);
-		webviewObj.setAttribute('preload', '../preload.js');
+		webviewObj.setAttribute('preload', './preload.js');
 		webviewObj.setAttribute('allowpopups', 'on');
 		webviewObj.setAttribute('disablewebsecurity', 'on');
 
@@ -85,7 +87,17 @@ class WebView extends EventEmitter {
 					servers.setActive(host.url);
 					break;
 				case 'get-sourceId':
-					ipcRenderer.send('open-screenshare-dialog');
+					desktopCapturer.getSources({ types: ['window', 'screen'] }, (error, sources) => {
+						if (error) {
+							throw error;
+						}
+
+						sources = sources.map((source) => {
+							source.thumbnail = source.thumbnail.toDataURL();
+							return source;
+						});
+						ipcRenderer.send('screenshare', sources);
+					});
 					break;
 				case 'reload-server':
 					const active = this.getActive();
@@ -100,8 +112,7 @@ class WebView extends EventEmitter {
 		});
 
 		webviewObj.addEventListener('dom-ready', () => {
-			webviewObj.classList.add('ready');
-			this.emit('dom-ready', webviewObj, host.url);
+			this.emit('dom-ready', host.url);
 		});
 
 		webviewObj.addEventListener('did-fail-load', (e) => {

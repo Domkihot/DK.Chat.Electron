@@ -1,6 +1,6 @@
 image: Visual Studio 2017
 environment:
-  nodejs_version: "10"
+  nodejs_version: "8"
 platform:
   - x64
 skip_tags: true
@@ -21,8 +21,11 @@ install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - set CI=true
   - yarn
-  - yarn test
-  - yarn e2e
+  - yarn list
 
 build_script:
   - yarn release
+
+artifacts:
+  - path: 'dist\*.exe'
+  - path: 'dist\*.appx'

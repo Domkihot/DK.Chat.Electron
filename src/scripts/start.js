@@ -3,11 +3,9 @@ import attachEvents from './events';
 import servers from './servers';
 import sidebar from './sidebar';
 import webview from './webview';
-import i18n from '../i18n';
+import i18n from '../i18n/index.js';
 
-export const start = async function() {
-	await i18n.initialize();
-
+export const start = function() {
 	const defaultInstance = 'https://open.rocket.chat';
 
 	// connection check
@@ -46,33 +44,33 @@ export const start = async function() {
 				hostField.value = host;
 
 				if (host.length === 0) {
-					button.value = i18n.__('landing.connect');
+					button.value = i18n.__('Connect');
 					button.disabled = false;
 					resolve();
 					return;
 				}
 
-				button.value = i18n.__('landing.validating');
+				button.value = i18n.__('Validating');
 				button.disabled = true;
 
 				servers.validateHost(host, 2000).then(function() {
-					button.value = i18n.__('landing.connect');
+					button.value = i18n.__('Connect');
 					button.disabled = false;
 					resolve();
 				}, function(status) {
 					// If the url begins with HTTP, mark as invalid
 					if (/^https?:\/\/.+/.test(host) || status === 'basic-auth') {
-						button.value = i18n.__('landing.invalidUrl');
+						button.value = i18n.__('Invalid_url');
 						invalidUrl.style.display = 'block';
 						switch (status) {
 							case 'basic-auth':
-								invalidUrl.innerHTML = i18n.__('error.authNeeded', { auth: 'username:password@host' });
+								invalidUrl.innerHTML = i18n.__('Auth_needed_try', '<b>username:password@host</b>');
 								break;
 							case 'invalid':
-								invalidUrl.innerHTML = i18n.__('error.noValidServerFound');
+								invalidUrl.innerHTML = i18n.__('No_valid_server_found');
 								break;
 							case 'timeout':
-								invalidUrl.innerHTML = i18n.__('error.connectTimeout');
+								invalidUrl.innerHTML = i18n.__('Timeout_trying_to_connect');
 								break;
 						}
 						hostField.classList.add('wrong');
