@@ -51,6 +51,9 @@ const canAutoUpdate = () => updateSettings.autoUpdate !== false;
 const canSetAutoUpdate = () => !appUpdateSettings.forced || appUpdateSettings.autoUpdate !== false;
 
 const setAutoUpdate = (canAutoUpdate) => {
+
+	return; // отключаем автообновление
+
 	if (!canSetAutoUpdate()) {
 		return;
 	}
@@ -71,6 +74,8 @@ const downloadUpdate = () => {
 let checkForUpdatesEvent = null;
 
 const checkForUpdates = (e = null, { forced = false } = {}) => {
+	return;
+
 	if (checkForUpdatesEvent) {
 		return;
 	}
@@ -98,6 +103,8 @@ const handleCheckingForUpdate = () => {
 };
 
 const handleUpdateAvailable = ({ version }) => {
+	return;
+
 	if (checkForUpdatesEvent) {
 		checkForUpdatesEvent.sender.send('update-result', true);
 		checkForUpdatesEvent = null;
@@ -110,6 +117,8 @@ const handleUpdateAvailable = ({ version }) => {
 };
 
 const handleUpdateNotAvailable = () => {
+
+	return;
 	sendToMainWindow('update-not-available');
 
 	if (checkForUpdatesEvent) {

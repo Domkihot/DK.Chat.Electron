@@ -85,9 +85,9 @@ export const getMainWindow = async() => {
 		mainWindow.loadURL(`file://${ __dirname }/public/app.html`);
 		attachWindowStateHandling(mainWindow);
 
-		if (process.env.NODE_ENV === 'development') {
-			mainWindow.openDevTools();
-		}
+		// if (process.env.NODE_ENV === 'development') {
+		// 	mainWindow.openDevTools();
+		// }
 	}
 
 	return mainWindow;

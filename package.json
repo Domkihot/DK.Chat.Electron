@@ -1,16 +1,16 @@
 {
   "name": "rocketchat",
-  "productName": "Rocket.Chat",
-  "description": "Rocket.Chat Native Cross-Platform Desktop Application via Electron.",
+  "productName": "DK.Chat",
+  "description": "DK.Chat Native Cross-Platform Desktop Application via Electron.",
   "version": "2.15.1",
-  "author": "Rocket.Chat Support <support@rocket.chat>",
-  "copyright": "© 2019, Rocket.Chat",
-  "homepage": "https://rocket.chat",
+  "author": "DK.Chat Support <403@domkihot.ru>",
+  "copyright": "© 2019, Domkihot",
+  "homepage": "http://chat.domkihot.ru:3000",
   "license": "MIT",
   "main": "app/background.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RocketChat/Rocket.Chat.Electron.git"
+    "url": "https://github.com/Domkihot/Dk.Chat.Electron.git"
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
